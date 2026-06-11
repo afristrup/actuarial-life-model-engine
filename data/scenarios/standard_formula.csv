@@ -1,0 +1,6 @@
+scenario_id,risk_type,aggregation_category,name,enabled,stress_name,stress_value
+mortality_up_15,mortality,life,Mortality Up 15%,TRUE,mortality_multiplier,1.15
+expense_up_10,expense,life,Expense Up 10%,TRUE,expense_multiplier,1.1
+interest_down_100bps,interest,market,Interest Down 100bps,TRUE,interest_rate_shift,-0.01
+lapse_up_50,lapse,life,Lapse Up 50%,TRUE,lapse_multiplier,1.5
+lapse_down_50,lapse,life,Lapse Down 50%,TRUE,lapse_multiplier,0.5

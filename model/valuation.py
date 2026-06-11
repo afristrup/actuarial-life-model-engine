@@ -20,7 +20,10 @@ ProjectionResult
 """
 
 from model.projection import project_cashflows
-from model.results import ValuationResult, ValuationRow
+from model.results import (
+    ValuationResult,
+    ValuationRow
+)
 
 
 def value_policy(policy, assumptions, return_breakdown=False):

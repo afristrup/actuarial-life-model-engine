@@ -1,0 +1,8 @@
+risk_module,mortality,longevity,disability,lapse,expense,revision,catastrophe
+mortality,1,0,0.25,0.25,0.25,0,0.25
+longevity,0,1,0.25,0.25,0.25,0,0.25
+disability,0.25,0.25,1,0.5,0.5,0,0.25
+lapse,0.25,0.25,0.5,1,0.5,0,0.25
+expense,0.25,0.25,0.5,0.5,1,0,0.25
+revision,0,0,0,0,0,1,0
+catastrophe,0.25,0.25,0.25,0.25,0.25,0,1

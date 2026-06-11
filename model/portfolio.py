@@ -18,7 +18,10 @@ ValuationResult
 """
 
 from model.valuation import value_policy
-from model.results import PortfolioResult, ValuationRow
+from model.results import (
+    PortfolioResult,
+    ValuationRow
+)
 
 
 class Portfolio:

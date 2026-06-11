@@ -19,7 +19,10 @@ Policy
 → ProjectionResult
 """
 
-from model.results import ProjectionRow, ProjectionResult
+from model.results import (
+    ProjectionRow,
+    ProjectionResult
+)
 
 def project_cashflows(policy, assumptions):
     """

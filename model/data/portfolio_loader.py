@@ -2,7 +2,7 @@ import pandas as pd
 
 from model.policy import Policy
 from model.portfolio import Portfolio
-from model.data.validation import validate_required_columns
+from model.data.portfolio_validation import validate_required_columns
 
 def row_to_policy(row):
     """

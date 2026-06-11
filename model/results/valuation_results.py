@@ -1,150 +1,21 @@
 """
-Structured modelling result contracts.
+Structured valuation result contracts.
 
 Purpose:
-- provide stable interfaces between engine layers
-- separate modelling mechanics from analytics
-- support serialisation and downstream analysis
+- provide stable valuation output interfaces
+- separate valuation mechanics from analytics
+- support downstream reporting and capital workflows
 
 Key principle:
 Result objects are pure data containers.
 
 Architecture flow:
-Projection
-→ ProjectionResult
+ProjectionResult
+→ ValuationRow
 → ValuationResult
-→ PortfolioResult
 """
 
 from typing import List, Dict, Optional
-
-class ProjectionRow:
-    """
-    Represents one projected time period.
-
-    Pure data container:
-    - no projection logic
-    - no actuarial calculations
-
-    Used as the structured output of projection.py
-    """
-
-    __slots__ = [
-        "t",
-        "age",
-        "prob_inforce",
-        "qx",
-        "lapse_rate",
-        "expected_premium",
-        "expected_claim",
-        "expected_lapse",
-        "expected_acquisition_expense",
-        "expected_maintenance_expense",
-        "expected_total_expense",
-    ]
-
-    def __init__(
-        self,
-        t: int,
-        age: int,
-        prob_inforce: float,
-        qx: float,
-        lapse_rate: float,
-        expected_premium: float,
-        expected_claim: float,
-        expected_lapse: float,
-        expected_acquisition_expense: float,
-        expected_maintenance_expense: float,
-        expected_total_expense: float
-    ):
-
-        self.t = t
-        self.age = age
-        self.prob_inforce = prob_inforce
-        self.qx = qx
-        self.lapse_rate = lapse_rate
-        self.expected_premium = expected_premium
-        self.expected_claim = expected_claim
-        self.expected_lapse = expected_lapse
-        self.expected_acquisition_expense = (
-    expected_acquisition_expense
-)
-        self.expected_maintenance_expense = (
-    expected_maintenance_expense
-)
-        self.expected_total_expense = (
-    expected_total_expense
-)
-
-    def to_dict(self) -> dict:
-        """
-        Convert to dictionary for compatibility/debugging.
-        """
-
-        return {
-            "t": self.t,
-            "age": self.age,
-            "prob_inforce": self.prob_inforce,
-            "qx": self.qx,
-            "lapse_rate": self.lapse_rate,
-            "expected_premium": self.expected_premium,
-            "expected_claim": self.expected_claim,
-            "expected_lapse": self.expected_lapse,
-            "expected_acquisition_expense":
-                self.expected_acquisition_expense,
-            "expected_maintenance_expense":
-                self.expected_maintenance_expense,
-            "expected_total_expense":
-                self.expected_total_expense,
-        }
-
-    def __repr__(self):
-
-        return (
-            f"ProjectionRow("
-            f"t={self.t}, "
-            f"age={self.age}, "
-            f"prob_inforce={self.prob_inforce:.6f}, "
-            f"qx={self.qx:.6f}"
-            f")"
-        )
-
-class ProjectionResult:
-    """
-    Container for projected policy cashflows.
-
-    Holds all projection rows produced during projection.
-
-    Design:
-    - structured output contract
-    - no actuarial logic
-    """
-
-    __slots__ = ["rows"]
-
-    def __init__(self, rows: List[ProjectionRow]):
-
-        if not isinstance(rows, list):
-            raise TypeError("rows must be a list")
-
-        self.rows = rows
-
-    def to_dict(self) -> dict:
-        """
-        Convert projection rows into serialisable format.
-        """
-
-        return {
-            "rows": [row.to_dict() for row in self.rows]
-        }
-
-    def __repr__(self):
-
-        return (
-            f"ProjectionResult("
-            f"rows={len(self.rows)}"
-            f")"
-        )
 
 class ValuationRow:
     """
@@ -291,6 +162,30 @@ class ValuationResult:
         self.net_value: float = net_value
         self.breakdown: Optional[List[Dict]] = breakdown
 
+    @property
+    def best_estimate_liability(self) -> float:
+        """
+        Solvency-style Best Estimate Liability (BEL).
+
+        Positive BEL represents a liability.
+        """
+
+        return (
+            self.pv_claims
+            + self.pv_expenses
+            - self.pv_premiums
+        )
+
+    @property
+    def pv_future_profit(self) -> float:
+        """
+        Present Value of Future Profits (PVFP).
+
+        Positive PVFP represents expected future profit.
+        """
+
+        return -self.best_estimate_liability
+    
     # Provided for backward compatibility and easy serialisation
     def to_dict(self) -> dict:
         """
@@ -300,7 +195,9 @@ class ValuationResult:
             "pv_premiums": self.pv_premiums,
             "pv_claims": self.pv_claims,
             "pv_expenses": self.pv_expenses,
-            "net_value": self.net_value
+            "net_value": self.net_value,
+            "best_estimate_liability": self.best_estimate_liability,
+            "pv_future_profit": self.pv_future_profit
         }
 
         if self.breakdown is not None:
@@ -314,71 +211,8 @@ class ValuationResult:
             f"pv_premiums={self.pv_premiums:.2f}, "
             f"pv_claims={self.pv_claims:.2f}, "
             f"pv_expenses={self.pv_expenses:.2f}, "
-            f"net_value={self.net_value:.2f}, "
+            f"BEL={self.best_estimate_liability:.2f}, "
+            f"PVFP={self.pv_future_profit:.2f}, "
             f"breakdown={'Yes' if self.breakdown else 'No'}"
-            f")"
-        )
-    
-class PortfolioResult:
-    """
-    Structured output of portfolio valuation.
-
-    Aggregates results across multiple policies.
-
-    Pure data container:
-    - no valuation logic
-    - no analytics
-    """
-
-    __slots__ = [
-        "pv_premiums",
-        "pv_claims",
-        "pv_expenses",
-        "net_value",
-        "policy_count",
-        "breakdown"
-    ]
-
-    def __init__(
-        self,
-        pv_premiums: float,
-        pv_claims: float,
-        pv_expenses: float,
-        net_value: float,
-        policy_count: int,
-        breakdown=None
-    ):
-
-        self.pv_premiums = pv_premiums
-        self.pv_claims = pv_claims
-        self.pv_expenses = pv_expenses
-        self.net_value = net_value
-        self.policy_count = policy_count
-        self.breakdown = breakdown
-
-    def to_dict(self):
-
-        result = {
-            "pv_premiums": self.pv_premiums,
-            "pv_claims": self.pv_claims,
-            "pv_expenses": self.pv_expenses,
-            "net_value": self.net_value,
-            "policy_count": self.policy_count
-        }
-
-        if self.breakdown is not None:
-            result["breakdown"] = [
-                row.to_dict() for row in self.breakdown
-            ]
-
-        return result
-
-    def __repr__(self):
-
-        return (
-            f"PortfolioResult("
-            f"policies={self.policy_count}, "
-            f"pv_expenses={self.pv_expenses:.2f}, "
-            f"net_value={self.net_value:.2f}"
             f")"
         )
