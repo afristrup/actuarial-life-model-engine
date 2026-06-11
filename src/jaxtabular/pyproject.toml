@@ -1,0 +1,24 @@
+[project]
+name = "jaxtabular"
+version = "0.1.0"
+description = "Polars feature engineering into JAX training loops."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "polars>=1.0",
+    "jax>=0.4.30",
+    "numpy>=1.26",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pyrefly>=1.0.0",
+    "pytest>=8",
+]
+
+[tool.pyrefly]
+project-includes = ["jaxtabular", "tests"]

@@ -1,0 +1,31 @@
+[project]
+name = "actuarial-life-model-engine"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+original = [
+    "jupyter>=1.0",
+    "matplotlib>=3.7",
+    "notebook>=7.0",
+    "numpy>=1.24",
+    "openpyxl>=3.1",
+    "pandas>=2.0",
+    "scipy>=1.10",
+    "seaborn>=0.12",
+]
+
+[tool.uv.workspace]
+members = [
+    "src/jaxtabular",
+    "src/lifebook",
+]
+
+[tool.pyrefly]
+# Workspace members each own their pyrefly config; the root scope only covers
+# top-level entrypoints. Legacy `model/` and notebooks are intentionally excluded
+# until they migrate to lifebook.
+project-includes = ["main.py"]

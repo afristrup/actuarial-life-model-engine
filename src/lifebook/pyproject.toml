@@ -1,0 +1,32 @@
+[project]
+name = "lifebook"
+version = "0.1.0"
+description = "JAX-vectorised life insurance valuation engine. Pydantic at the boundary."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "polars>=1.0",
+    "pydantic>=2.7",
+    "jax>=0.4.30",
+    "numpy>=1.26",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pyrefly>=1.0.0",
+    "pytest>=8",
+    "pandas>=2.0",
+]
+
+[tool.pyrefly]
+project-includes = ["lifebook", "tests"]
+search-path = ["../.."]
+
+[tool.pytest.ini_options]
+markers = [
+    "benchmark: speedup measurement (skipped by default — run with `-m benchmark`)",
+]
